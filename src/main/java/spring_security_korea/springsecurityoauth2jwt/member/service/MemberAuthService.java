@@ -18,5 +18,9 @@ public class MemberAuthService {
 		return memberRepository.findBySocialId(socialId);
 	}
 
+	public Member getMemberByEmail(String email){
+		return memberRepository.findByEmail(email);
+	}
+
 
 }
