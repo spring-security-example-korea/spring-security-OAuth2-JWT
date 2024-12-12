@@ -9,6 +9,7 @@ import spring_security_korea.springsecurityoauth2jwt.utils.BaseEntity;
 import spring_security_korea.springsecurityoauth2jwt.utils.Role;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -37,6 +38,9 @@ public class Member extends BaseEntity {
 
     private String refreshToken;
 
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid;
+
 
     @Builder
     public Member(String username, String password, String email, String profileImage, String socialId, Role role) {
@@ -46,6 +50,7 @@ public class Member extends BaseEntity {
         this.profileImage = profileImage;
         this.socialId = socialId;
         this.role = role;
+        this.uuid = UUID.randomUUID();
     }
 
     public void softDelete() {
@@ -55,5 +60,9 @@ public class Member extends BaseEntity {
 
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void regenerateUUID() {
+        this.uuid = UUID.randomUUID();
     }
 }
