@@ -25,7 +25,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		PrincipalUser oAuth2UserPrincipal = getOAuth2UserPrincipal(authentication);
 
 		if (oAuth2UserPrincipal == null) {
-			log.error("Failed to get CustomOAuth2UserPrincipal from authentication");
+			log.error("Failed to get PrincipalUser from authentication");
 			response.sendRedirect("/oauth2-error");
 		}
 
