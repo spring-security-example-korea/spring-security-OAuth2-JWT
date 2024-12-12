@@ -11,13 +11,24 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import lombok.RequiredArgsConstructor;
+import spring_security_korea.springsecurityoauth2jwt.member.service.MemberAuthService;
+import spring_security_korea.springsecurityoauth2jwt.security.jwt.filter.JwtAuthenticationProcessingFilter;
+import spring_security_korea.springsecurityoauth2jwt.security.jwt.service.JwtService;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+	private final JwtService jwtService;
+	private final MemberAuthService memberAuthService;
+
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -37,6 +48,14 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.formLogin(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable);
+
+
+		// [PART4]
+		// 원격 시큐리티 필터 순서가 LogoutFilter 이후에 로그인 필터 동작
+		// 따라서, LogoutFilter 이후에 우리가 만든 필터 동작하도록 설정
+		// 순서: LogoutFilter -> JwtAuthenticationProcessFilter
+		http
+			.addFilterBefore(jwtAuthenticationProcessingFilter(), LogoutFilter.class);
 
 		return http.build();
 	}
@@ -59,5 +78,10 @@ public class SecurityConfig {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter(){
+		return new JwtAuthenticationProcessingFilter(jwtService, memberAuthService);
 	}
 }
