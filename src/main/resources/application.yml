@@ -3,7 +3,7 @@ spring:
     properties:
       hibernate:
         show_sql: false
-        format_sql: false
+        format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: update
@@ -37,3 +37,13 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-info-authentication-method: header
             user-name-attribute: id
+
+jwt:
+  secretKey: "your-secret-key"  # JWT 서명에 사용되는 비밀 키
+  access:
+    expiration: 3600  # 액세스 토큰 만료 시간(초)
+    cookie: "accessToken"  # 액세스 토큰의 쿠키 이름
+  refresh:
+    expiration: 86400  # 리프레시 토큰 만료 시간(초)
+    cookie: "refreshToken"  # 리프레시 토큰의 쿠키 이름
+  redirect-uri-user: "http://localhost:3000/user"  # 사용자 리디렉션 URL
