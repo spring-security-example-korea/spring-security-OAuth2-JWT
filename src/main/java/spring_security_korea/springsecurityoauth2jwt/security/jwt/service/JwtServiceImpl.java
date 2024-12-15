@@ -20,7 +20,7 @@ public class JwtServiceImpl implements JwtService {
 
 	@Override
 	public String createAccessToken(String email) {
-		Member member = memberAuthService.getMemberBySocialId(email);
+		Member member = memberAuthService.getMemberByEmail(email);
 		return hmacJwtTokenGeneratorImpl.generateAccessToken(member.getEmail(), member.getUuid().toString(),
 			member.getRole().getRoleName());
 	}
@@ -29,4 +29,5 @@ public class JwtServiceImpl implements JwtService {
 	public String createRefreshToken() {
 		return hmacJwtTokenGeneratorImpl.generateRefreshToken();
 	}
+
 }
