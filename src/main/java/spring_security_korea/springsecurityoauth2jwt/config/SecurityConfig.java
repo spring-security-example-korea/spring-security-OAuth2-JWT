@@ -15,20 +15,30 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import lombok.RequiredArgsConstructor;
+import spring_security_korea.springsecurityoauth2jwt.security.oauth2.handler.OAuth2AuthenticationFailureHandler;
+import spring_security_korea.springsecurityoauth2jwt.security.oauth2.handler.OAuth2AuthenticationSuccessHandler;
+import spring_security_korea.springsecurityoauth2jwt.security.oauth2.service.CustomOAuth2UserService;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+	private final CustomOAuth2UserService customOAuth2UserService;
+	private final OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
+	private final OAuth2AuthenticationFailureHandler oAuth2FailureHandler;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 		http
-			.authorizeHttpRequests(authorizeHttp ->
-				authorizeHttp
-					.requestMatchers("/")
-					.permitAll()
-					.anyRequest()
-					.authenticated());
+			.authorizeHttpRequests(auth -> auth
+				.requestMatchers("/api/user/**").hasRole("USER")
+				.requestMatchers("/api/admin/**").hasRole("ADMIN")
+				.requestMatchers("/login-error").permitAll()
+				.anyRequest().authenticated()
+			);
 
 		http
 			.cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()));
@@ -37,6 +47,13 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.formLogin(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable);
+
+		http
+			.oauth2Login(oauth2 -> oauth2
+				.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
+					.userService(customOAuth2UserService))
+				.successHandler(oAuth2SuccessHandler)
+				.failureHandler(oAuth2FailureHandler));
 
 		return http.build();
 	}
