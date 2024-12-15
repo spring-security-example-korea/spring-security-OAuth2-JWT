@@ -16,6 +16,11 @@ import lombok.NoArgsConstructor;
 import spring_security_korea.springsecurityoauth2jwt.utils.BaseEntity;
 import spring_security_korea.springsecurityoauth2jwt.utils.Role;
 
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -45,6 +50,12 @@ public class Member extends BaseEntity {
 
 	private LocalDateTime softDeleteTime;
 
+
+    @Column(nullable = false, unique = true, updatable = false)
+    private UUID uuid;
+
+
+    
 	private String refreshToken;
 
 	@Builder
@@ -59,12 +70,20 @@ public class Member extends BaseEntity {
 		this.role = role;
 	}
 
+
 	public void softDelete() {
 		this.softDelete = true;
 		softDeleteTime = LocalDateTime.now();
 	}
 
-	public void setRefreshToken(String refreshToken) {
-		this.refreshToken = refreshToken;
-	}
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public void regenerateUUID() {
+        this.uuid = UUID.randomUUID();
+    }
+
+
 }
