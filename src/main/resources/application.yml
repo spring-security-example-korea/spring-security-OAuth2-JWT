@@ -39,7 +39,7 @@ spring:
             user-name-attribute: id
 
 jwt:
-  secretKey: "your-secret-key"  # JWT 서명에 사용되는 비밀 키
+  secretKey: "a-secure-key-with-at-least-32-characters"  # JWT 서명에 사용되는 비밀 키
   access:
     expiration: 3600  # 액세스 토큰 만료 시간(초)
     cookie: "accessToken"  # 액세스 토큰의 쿠키 이름
