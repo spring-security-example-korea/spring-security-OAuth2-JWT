@@ -2,12 +2,17 @@ package spring_security_korea.springsecurityoauth2jwt.security.jwt.token;
 
 import static spring_security_korea.springsecurityoauth2jwt.config.JwtConfig.*;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+
+import javax.crypto.SecretKey;
 
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import spring_security_korea.springsecurityoauth2jwt.config.JwtConfig;
 
@@ -33,10 +38,13 @@ public class HmacJwtTokenGeneratorImpl implements JwtTokenGenerator {
 		Instant now = Instant.now();
 		Instant expirationTime = now.plusSeconds(expirationPeriod);
 
+		// SecretKey 생성 (jwtConfig에서 동일한 방식으로 생성)
+		SecretKey secretKey = Keys.hmacShaKeyFor(jwtConfig.getSecretKey().getBytes(StandardCharsets.UTF_8));
+
 		JwtBuilder jwtBuilder = Jwts.builder()
 			.claim("sub", subject)
 			.claim("exp", expirationTime.getEpochSecond())
-			.signWith(jwtConfig.getSigningKey());
+			.signWith(secretKey, SignatureAlgorithm.HS256);
 
 		if (email != null) {
 			jwtBuilder.claim(EMAIL_CLAIM, email);
@@ -52,4 +60,5 @@ public class HmacJwtTokenGeneratorImpl implements JwtTokenGenerator {
 
 		return jwtBuilder.compact();
 	}
+
 }

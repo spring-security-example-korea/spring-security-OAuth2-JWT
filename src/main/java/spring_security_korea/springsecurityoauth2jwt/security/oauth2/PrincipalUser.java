@@ -27,6 +27,11 @@ public record PrincipalUser(ProviderUser providerUser) implements UserDetails, O
 	}
 
 	@Override
+	public String getEmail() {
+		return providerUser.getEmail();
+	}
+
+	@Override
 	public String getUsername() {
 		return providerUser.getUsername();
 	}

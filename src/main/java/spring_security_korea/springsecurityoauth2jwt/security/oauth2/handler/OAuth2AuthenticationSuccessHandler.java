@@ -11,12 +11,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import spring_security_korea.springsecurityoauth2jwt.security.jwt.service.JwtService;
 import spring_security_korea.springsecurityoauth2jwt.security.oauth2.PrincipalUser;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
+	private final JwtService jwtService;
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -30,6 +33,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		}
 
 		// todo: JWT
+		assert oAuth2UserPrincipal != null;
+		loginSuccess(response, oAuth2UserPrincipal);
 
 		log.info("카카오 로그인 성공");
 		response.sendRedirect("/login-success");
@@ -43,5 +48,25 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 			return (PrincipalUser)principal;
 		}
 		return null;
+	}
+
+	private void loginSuccess(HttpServletResponse response, PrincipalUser oAuth2UserPrincipal) throws IOException {
+		String email = oAuth2UserPrincipal.getEmail();
+		if (email == null || email.isEmpty()) {
+			log.error("User email is missing");
+			response.sendRedirect("/oauth2-error");
+			return;
+		}
+
+		try {
+			String accessToken = jwtService.createAccessToken(oAuth2UserPrincipal.getEmail());
+			String refreshToken = jwtService.createRefreshToken();
+
+			jwtService.sendToken(response, accessToken, refreshToken);
+			jwtService.updateRefreshToken(oAuth2UserPrincipal.getEmail(), refreshToken);
+		} catch (Exception e) {
+			response.sendRedirect("/oauth2-error");
+		}
+
 	}
 }

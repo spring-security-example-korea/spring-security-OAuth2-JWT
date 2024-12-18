@@ -69,7 +69,7 @@ public class Member extends BaseEntity {
 		softDeleteTime = LocalDateTime.now();
 	}
 
-	public void setRefreshToken(String refreshToken) {
+	public void updateRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
 	}
 

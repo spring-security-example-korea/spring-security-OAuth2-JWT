@@ -1,5 +1,7 @@
 package spring_security_korea.springsecurityoauth2jwt.member.service;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -11,7 +13,7 @@ import spring_security_korea.springsecurityoauth2jwt.member.repository.MemberRep
 @RequiredArgsConstructor
 public class MemberAuthService {
 
-	private MemberRepository memberRepository;
+	private final MemberRepository memberRepository;
 
 	public Member getMemberBySocialId(String socialId) {
 		return memberRepository.findBySocialId(socialId).orElseThrow(
@@ -25,4 +27,20 @@ public class MemberAuthService {
 		);
 	}
 
+	public Optional<Member> getMemberByRefreshToken(String refreshToken) {
+		return memberRepository.findByRefreshToken(refreshToken);
+	}
+
+	public void updateRefreshToken(Member member, String reIssuedRefreshToken) {
+		member.updateRefreshToken(reIssuedRefreshToken);
+		memberRepository.saveAndFlush(member);
+	}
+
+	public Optional<Member> findOptionalMemberByEmail(String email) {
+		return memberRepository.findByEmail(email);
+	}
+
+	public void saveMember(Member member) {
+		memberRepository.save(member);
+	}
 }
